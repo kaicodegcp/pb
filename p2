@@ -1,0 +1,31 @@
+Authored & Published CDE/CDW Installation & Validation Documentation
+
+Description
+
+This week, focused efforts were made to create and publish step-by-step internal documentation for the installation and validation of Cloudera Data Engineering (CDE) and Cloudera Data Warehouse (CDW) services on OpenShift-based dev clusters. These Confluence pages were designed to standardize onboarding and validation procedures for engineering and operations teams.
+
+Key Accomplishments
+
+📝 Published two detailed Confluence guides:
+
+EAP Cloudera Data Services – Installation and CDE Validation
+
+EAP Cloudera Data Services – Installation and CDW Validation
+
+📷 Included annotated screenshots from OpenShift console, Cloudera Manager, and CDP UI for easy navigation and reproducibility.
+
+✅ Captured basic OpenShift validation steps:
+
+OC namespace creation
+
+Resource quota checks
+
+CDW environment activation steps
+
+Outcome & Team Impact
+
+📚 Standardized documentation ensures all teams follow consistent steps across environments.
+
+🚀 Reduces time for initial setup and manual troubleshooting during validation.
+
+👥 Enables quicker onboarding for new team members or support personnel working on dev/test clusters.
