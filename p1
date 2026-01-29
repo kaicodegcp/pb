@@ -1,0 +1,25 @@
+Hi Pablo,
+
+Thank you for the detailed context and for sharing Cloudera’s roadmap for Python support in CDP 7.3.2.
+
+To clarify Citi’s position: Python versions are governed by Citi Enterprise Python Engineering and OS platform standards, and only versions that are explicitly vendor-supported and security-certified are permitted for production use.
+
+At a high level, Citi currently recognizes the following Python versions as **vendor-supported**, based on enterprise certification, OS support, and security lifecycle status:
+
+* **Python 3.12.x** – Currently supported by Citi Enterprise Python Engineering and available for all Citi users.
+* **Python 3.11.x** – Enterprise-supported; however, adoption within EAP is pending platform alignment and rollout.
+* **Python 3.10.x** – Enterprise-supported and recently released for EAP usage, with deployment to EAP stacks in progress.
+* **Python 3.9.x (Anaconda distribution)** – Widely deployed across EAP SDLC environments today and serves as the current baseline for EAP application workloads.
+
+From an EAP and Cloudera perspective:
+
+* Python **3.8.x and 2.7** are still present strictly to meet existing Cloudera Manager and Hue dependencies and are not used for new application development.
+* Python versions outside the above list (for example, non-enterprise builds or OS-default Python without Citi certification) are not permitted for long-term production use.
+
+Given this, alignment between Cloudera-supported Python versions and Citi’s enterprise-certified Python roadmap is critical for sustained adoption. We would welcome continued coordination to ensure that upcoming CDP service packs align with Python versions that can be broadly adopted within Citi’s regulated environments.
+
+Please let us know if you would like a deeper technical sync between our platform teams to review timelines and compatibility in more detail.
+
+Thanks,
+Satish Kumar Karnati
+EAP Engineering
