@@ -61,3 +61,5 @@
     - name: Show Docker version
       ansible.builtin.debug:
         msg: "{{ docker_version.stdout }}"
+
+vars/docker_artifact_vars.yml
