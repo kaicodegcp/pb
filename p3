@@ -1,0 +1,63 @@
+---
+- name: Install Docker from Artifact Repository
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - vars/docker_artifact_vars.yml
+
+  vars:
+    docker_rpm_dir: /tmp/docker_rpms
+
+    docker_rpms:
+      - docker-ce-28.1.1-1.el8.x86_64.rpm
+      - docker-ce-cli-28.1.1-1.el8.x86_64.rpm
+      - docker-compose-plugin-2.26.1-1.el8.x86_64.rpm
+      - docker-buildx-plugin-0.14.1-1.el8.x86_64.rpm
+      - containerd.io-1.6.33-3.1.el8.x86_64.rpm
+
+  tasks:
+    - name: Create temp dir for Docker RPMs
+      ansible.builtin.file:
+        path: "{{ docker_rpm_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download Docker RPMs from artifact repo
+      ansible.builtin.get_url:
+        url: "{{ ARTIFACT_INPUT }}/{{ SOURCE_DOCKER_PATH_INPUT }}/{{ item }}"
+        dest: "{{ docker_rpm_dir }}/{{ item }}"
+        mode: "0644"
+        url_username: "{{ USER_INPUT }}"
+        url_password: "{{ PWD_INPUT }}"
+        force: true
+      loop: "{{ docker_rpms }}"
+      no_log: true
+
+    - name: Stop Docker if running (do not fail if not installed)
+      ansible.builtin.service:
+        name: docker
+        state: stopped
+      failed_when: false
+
+    - name: Install Docker RPMs via dnf (local files)
+      ansible.builtin.dnf:
+        name: "{{ docker_rpms | map('regex_replace', '^(.*)$', docker_rpm_dir ~ '/\\1') | list }}"
+        state: present
+        disable_gpg_check: true
+
+    - name: Enable and start Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Verify Docker version
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Show Docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_version.stdout }}"
