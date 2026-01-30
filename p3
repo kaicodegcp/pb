@@ -63,3 +63,9 @@
         msg: "{{ docker_version.stdout }}"
 
 vars/docker_artifact_vars.yml
+
+ARTIFACT_INPUT: "https://your-artifact-host/artifactory"
+SOURCE_DOCKER_PATH_INPUT: "path/to/docker/rpms"
+USER_INPUT: "your_user"
+PWD_INPUT: "your_password"
+
