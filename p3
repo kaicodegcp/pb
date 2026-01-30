@@ -69,3 +69,74 @@ SOURCE_DOCKER_PATH_INPUT: "path/to/docker/rpms"
 USER_INPUT: "your_user"
 PWD_INPUT: "your_password"
 
+
+
+---
+- name: Deploy OpenShift oc client from Artifact Repository
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - vars/oc_artifact_vars.yml
+
+  vars:
+    oc_install_dir: /usr/bin
+    oc_target_path: "{{ oc_install_dir }}/oc"
+    oc_versioned_path: "{{ oc_install_dir }}/oc-{{ OC_VERSION | default('unknown') }}"
+    oc_download_dest: "/tmp/oc"
+
+  tasks:
+    - name: Download oc binary from artifact repo
+      ansible.builtin.get_url:
+        url: "{{ ARTIFACT_BASE_URL }}/{{ OC_ARTIFACT_PATH }}"
+        dest: "{{ oc_download_dest }}"
+        mode: "0755"
+        url_username: "{{ ARTIFACT_USER }}"
+        url_password: "{{ ARTIFACT_PASSWORD }}"
+        force: true
+      no_log: true
+
+    - name: Install oc as versioned binary (atomic move)
+      ansible.builtin.copy:
+        src: "{{ oc_download_dest }}"
+        dest: "{{ oc_versioned_path }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Create/Update symlink /usr/bin/oc -> versioned oc
+      ansible.builtin.file:
+        src: "{{ oc_versioned_path }}"
+        dest: "{{ oc_target_path }}"
+        state: link
+        force: true
+
+    - name: Verify oc is installed
+      ansible.builtin.command: "{{ oc_target_path }} version --client"
+      register: oc_client_version
+      changed_when: false
+      failed_when: false
+
+    - name: Show oc client version
+      ansible.builtin.debug:
+        msg: "{{ oc_client_version.stdout | default('oc installed, but version check did not return output') }}"
+
+
+
+---
+# Base URL (no trailing slash)
+ARTIFACT_BASE_URL: "https://www.artifactrepository.citigroup.net:443/artifactory"
+
+# Path inside artifactory repo to the oc binary
+# Example from your screenshot: generic-cto-dev-local/cate-bigdata-165345/oc/oc
+OC_ARTIFACT_PATH: "generic-cto-dev-local/cate-bigdata-165345/oc/oc"
+
+# Optional version label (used only for naming /usr/bin/oc-<version>)
+OC_VERSION: "4.14.0"
+
+# Credentials
+ARTIFACT_USER: "bd_artifactory_read"
+ARTIFACT_PASSWORD: "CHANGE_ME"
+
