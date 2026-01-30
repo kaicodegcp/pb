@@ -137,6 +137,19 @@ OC_ARTIFACT_PATH: "generic-cto-dev-local/cate-bigdata-165345/oc/oc"
 OC_VERSION: "4.14.0"
 
 # Credentials
+
+
+
+.gitignore
+
+*.retry
+*.log
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
 ARTIFACT_USER: "bd_artifactory_read"
 ARTIFACT_PASSWORD: "CHANGE_ME"
 
