@@ -1,0 +1,119 @@
+clean_base.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Deduplicate basefile.txt (comma-separated) and produce clean_base_versions.txt (one per line, unique)
+# Usage:
+#   ./script1_clean_base.sh basefile.txt clean_base_versions.txt
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: $0 <basefile.txt> <clean_base_versions.txt>" >&2
+  exit 1
+fi
+
+in_file="$1"
+out_file="$2"
+
+if [[ ! -f "$in_file" ]]; then
+  echo "ERROR: Input file not found: $in_file" >&2
+  exit 1
+fi
+
+# Convert commas -> newlines, trim spaces, drop empties, unique+sorted
+tr ',' '\n' < "$in_file" \
+  | sed -e 's/^[[:space:]]\+//; s/[[:space:]]\+$//' \
+  | sed '/^$/d' \
+  | sort -u \
+  > "$out_file"
+
+echo "OK: Clean base versions written to: $out_file"
+echo "Count: $(wc -l < "$out_file")"
+
+
+generate_delta.sh
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Compare clean base versions vs images.txt and produce:
+# 1) delta_versions.txt : comma-separated unique tags (versions) found in images.txt but not in base
+# 2) delta_images.txt   : one image:version per new delta version (first image line for that version)
+#
+# Usage:
+#   ./script2_generate_delta.sh clean_base_versions.txt images.txt delta_versions.txt delta_images.txt
+
+if [[ $# -ne 4 ]]; then
+  echo "Usage: $0 <clean_base_versions.txt> <images.txt> <delta_versions.txt> <delta_images.txt>" >&2
+  exit 1
+fi
+
+base_versions="$1"
+images_file="$2"
+delta_versions_out="$3"
+delta_images_out="$4"
+
+if [[ ! -f "$base_versions" ]]; then
+  echo "ERROR: Base versions file not found: $base_versions" >&2
+  exit 1
+fi
+if [[ ! -f "$images_file" ]]; then
+  echo "ERROR: Images file not found: $images_file" >&2
+  exit 1
+fi
+
+declare -A base_set
+declare -A seen_new_tag
+declare -A tag_to_image
+
+# Load base versions into a set
+while IFS= read -r v; do
+  v="$(echo "$v" | sed -e 's/^[[:space:]]\+//; s/[[:space:]]\+$//')"
+  [[ -z "$v" ]] && continue
+  base_set["$v"]=1
+done < "$base_versions"
+
+# Walk through images.txt and capture first image per new tag
+while IFS= read -r line; do
+  line="$(echo "$line" | sed -e 's/^[[:space:]]\+//; s/[[:space:]]\+$//')"
+  [[ -z "$line" ]] && continue
+  [[ "$line" =~ ^# ]] && continue
+
+  # Must contain ":" to have a tag
+  [[ "$line" != *:* ]] && continue
+
+  # Tag = text after last ':'
+  tag="${line##*:}"
+
+  # If tag isn't in base, record it once
+  if [[ -z "${base_set[$tag]+x}" ]]; then
+    if [[ -z "${seen_new_tag[$tag]+x}" ]]; then
+      seen_new_tag["$tag"]=1
+      tag_to_image["$tag"]="$line"
+    fi
+  fi
+done < "$images_file"
+
+# Create a sorted list of new tags
+tmp_tags="$(mktemp)"
+for tag in "${!seen_new_tag[@]}"; do
+  echo "$tag"
+done | sort > "$tmp_tags"
+
+# 1) delta_versions.txt -> comma-separated, unique, no trailing comma
+# (if no tags found, output empty file)
+: > "$delta_versions_out"
+if [[ -s "$tmp_tags" ]]; then
+  paste -sd, "$tmp_tags" > "$delta_versions_out"
+fi
+
+# 2) delta_images.txt -> one image line per new tag (aligned with sorted tag order)
+: > "$delta_images_out"
+while IFS= read -r tag; do
+  echo "${tag_to_image[$tag]}" >> "$delta_images_out"
+done < "$tmp_tags"
+
+rm -f "$tmp_tags"
+
+echo "OK: delta versions (comma-separated) -> $delta_versions_out"
+echo "OK: delta images (one per version) -> $delta_images_out"
+echo "New version count: $(awk -F, 'NF==1 && $1=="" {print 0; exit} {print NF; exit}' "$delta_versions_out" 2>/dev/null || echo 0)"
