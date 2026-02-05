@@ -117,3 +117,13 @@ rm -f "$tmp_tags"
 echo "OK: delta versions (comma-separated) -> $delta_versions_out"
 echo "OK: delta images (one per version) -> $delta_images_out"
 echo "New version count: $(awk -F, 'NF==1 && $1=="" {print 0; exit} {print NF; exit}' "$delta_versions_out" 2>/dev/null || echo 0)"
+
+
+
+
+chmod +x script1_clean_base.sh script2_generate_delta.sh
+
+./script1_clean_base.sh basefile.txt clean_base_versions.txt
+
+./script2_generate_delta.sh clean_base_versions.txt images.txt delta_versions.txt delta_images.txt
+
