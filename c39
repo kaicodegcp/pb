@@ -65,4 +65,19 @@ print(openpyxl.__version__, openpyxl.__file__)
 
 print(type(worksheet_object), worksheet_object.__class__.__module__)
 
-  
+
+
+We have validated the issue on the citiconda39 Python 3.9.20 environment.
+
+Findings:
+
+Confirmed that both xlsxwriter (3.2.3) and openpyxl (3.1.5) are installed from the citiconda39 parcel.
+
+However, during validation, the Worksheet object does not contain the add_pivot_table attribute.
+
+This indicates that the currently packaged version/build available in the citiconda39 distribution does not support pivot table creation.
+
+Next Steps:
+We will engage our AI/ML Engineering team, who manage the citiconda package distribution, to review this requirement and determine whether the necessary package/version supporting pivot table functionality can be included in the Python 3.9 environment.
+
+We will provide an update once we receive confirmation from the engineering team.
