@@ -1,0 +1,68 @@
+which python3
+python3 -V
+
+python3 -c "import xlsxwriter, openpyxl; print('xlsxwriter', xlsxwriter.__version__, xlsxwriter.__file__); print('openpyxl', openpyxl.__version__, openpyxl.__file__)"
+
+
+import xlsxwriter
+
+wb = xlsxwriter.Workbook("/tmp/pivot_test.xlsx")
+ws = wb.add_worksheet("Data")
+
+print("xlsxwriter version:", xlsxwriter.__version__)
+print("Worksheet type:", type(ws))
+print("Has add_pivot_table?", hasattr(ws, "add_pivot_table"))
+print("Similar pivot methods:", [m for m in dir(ws) if "pivot" in m.lower()])
+
+wb.close()
+
+writer = pd.ExcelWriter("x.xlsx", engine="openpyxl")   # or default
+ws = writer.sheets["Sheet1"]                           # openpyxl worksheet
+ws.add_pivot_table(...)                                # ❌ will fail
+
+print(type(ws))
+print(ws.__class__.__module__)
+
+import xlsxwriter
+
+path = "/tmp/pivot_smoke.xlsx"
+wb = xlsxwriter.Workbook(path)
+
+data = wb.add_worksheet("Data")
+pivot = wb.add_worksheet("Pivot")
+
+# Write simple data
+rows = [
+    ["Region", "Product", "Sales"],
+    ["East", "A", 10],
+    ["East", "B", 20],
+    ["West", "A", 30],
+    ["West", "B", 40],
+]
+for r, row in enumerate(rows):
+    for c, v in enumerate(row):
+        data.write(r, c, v)
+
+# Define pivot using the data range (A1:C5)
+# NOTE: Excel will finalize/refresh pivot when opened.
+pivot.add_pivot_table({
+    "data":       "Data!A1:C5",
+    "name":       "PivotTable1",
+    "rows":       [{"field": "Region"}],
+    "columns":    [{"field": "Product"}],
+    "values":     [{"field": "Sales", "function": "sum"}],
+    "location":   "A3",
+})
+
+wb.close()
+print("Created:", path)
+
+
+
+import xlsxwriter, openpyxl
+print(xlsxwriter.__version__, xlsxwriter.__file__)
+print(openpyxl.__version__, openpyxl.__file__)
+
+print(type(worksheet_object), worksheet_object.__class__.__module__)
+
+  
