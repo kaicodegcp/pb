@@ -1,0 +1,35 @@
+Enabling EAP Bitbucket to GitHub Migration Through Team Demo
+
+Description
+
+This week, the EAP Engineering team supported the Bitbucket-to-GitHub migration initiative by conducting a live demo for engineering teams. The session demonstrated the migration workflow, highlighted the importance of lint-free repositories, and walked through the required commands to help teams prepare their code for GitHub.
+
+The effort focused on simplifying the migration process and ensuring teams clearly understand the steps needed to complete their repository transitions efficiently.
+
+Key Achievements
+
+Delivered a demo explaining the Bitbucket-to-GitHub migration process.
+
+Demonstrated lint-free Ansible repositories to ensure migration readiness.
+
+Guided teams through essential commands and pre-migration checks.
+
+Helped accelerate the migration effort across EAP repositories.
+
+Benefits to the Team
+
+Simplifies the migration process for engineering teams.
+
+Encourages higher code quality by promoting lint-free standards.
+
+Aligns repositories with the enterprise GitHub platform.
+
+Reduces delays by providing clear migration guidance.
+
+Next Steps
+
+Continue supporting teams during their migration activities.
+
+Monitor progress to ensure timely completion of remaining repositories.
+
+Promote best practices for maintaining lint-free code post-migration.
