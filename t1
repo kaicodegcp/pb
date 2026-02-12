@@ -1,0 +1,303 @@
+
+Databricks on AWS – Terraform-Based Platform Deployment (Lab Implementation)
+📌 Objective
+
+Design and deploy a production-style Databricks platform on AWS using Terraform to demonstrate Infrastructure-as-Code (IaC), modular architecture, and enterprise-ready patterns for provisioning analytics environments per Line of Business (LOB).
+
+This lab validates the end-to-end flow:
+
+AWS Infrastructure → Databricks Account → Workspace → Compute → Storage → Spark Execution
+
+🧭 High-Level Architecture Flow
+Terraform (EC2 execution host)
+        ↓
+AWS Resource Provisioning
+(IAM, VPC, S3, Security)
+        ↓
+Databricks Account Resources
+(Credentials, Storage Config, Network)
+        ↓
+Workspace Creation
+        ↓
+Cluster Provisioning
+        ↓
+Unity Catalog Integration
+        ↓
+Spark Job Execution
+
+🏗️ Deployment Approach
+Infrastructure-as-Code Strategy
+
+Terraform used as the single provisioning engine.
+
+Modular design aligned with enterprise platform engineering practices.
+
+Reusable modules support multi-LOB expansion.
+
+Execution Host:
+
+✅ RHEL 8/9 EC2
+✅ Terraform
+✅ AWS CLI
+✅ Git
+✅ Databricks Provider
+
+🔧 Modules Implemented
+1️⃣ AWS Foundation Module
+
+Provisioned core cloud infrastructure required by Databricks.
+
+Resources Created
+
+Custom VPC
+
+Private and intra subnets
+
+Route tables
+
+Security groups
+
+VPC endpoints (S3, STS, Kinesis)
+
+Cross-account IAM role
+
+Compute IAM role
+
+Storage IAM role
+
+Root S3 bucket
+
+Unity Catalog bucket
+
+Audit log bucket
+
+KMS keys
+
+Naming Standard
+
+All resources deployed with suffix:
+
+sk-lab
+
+
+This ensures:
+
+Environment traceability
+
+Cost visibility
+
+Multi-env readiness
+
+2️⃣ Databricks Account Module
+
+Connected AWS infrastructure to the Databricks control plane.
+
+Configurations Created
+
+Credentials registration
+
+Storage configuration
+
+Network configuration
+
+Unity Catalog metastore
+
+External location
+
+Workspace deployment
+
+This mirrors enterprise onboarding patterns.
+
+3️⃣ Workspace Module
+
+Provisioned a fully operational Databricks workspace.
+
+Validated:
+
+✅ Workspace status: Running
+✅ Enterprise pricing tier
+✅ Unity Catalog enabled
+
+4️⃣ Compute Module
+
+Deployed a test cluster for Spark validation.
+
+Cluster Configuration
+
+Runtime: 17.3 LTS (Spark 4.x)
+
+Node Type: i3.xlarge
+
+Auto termination enabled
+
+Unity Catalog access configured
+
+Instance Profile registered to allow secure S3 access.
+
+🔐 Security Architecture
+
+The deployment follows cloud security best practices:
+
+IAM Role Separation
+
+Cross-account role → Databricks control plane
+
+Compute role → Cluster data access
+
+Storage role → External locations
+
+No Public Access
+
+S3 Block Public Access enabled
+
+Private networking enforced
+
+Credential Isolation
+
+Databricks assumes roles instead of using static keys.
+
+This aligns with enterprise compliance requirements.
+
+✅ Validation Performed
+Infrastructure Validation
+
+Terraform state confirmed:
+
+~90 resources provisioned successfully
+
+
+Examples:
+
+VPC
+
+IAM roles
+
+S3 buckets
+
+Metastore
+
+Workspace
+
+Workspace Validation
+
+Login successful.
+
+Navigation verified:
+
+✔ Catalog
+✔ Compute
+✔ Jobs
+✔ SQL
+
+Cluster Validation
+
+Cluster created and started successfully.
+
+Verified:
+
+Driver initialization
+
+Spark context
+
+Unity Catalog integration
+
+Storage Connectivity Validation
+
+Spark write/read test executed:
+
+df = spark.range(0, 100000)
+
+path = "s3://databricks-sk-lab-data/spark/delta-demo"
+
+df.write.format("delta").mode("overwrite").save(path)
+
+display(spark.read.format("delta").load(path))
+
+Result:
+
+✅ Data written to S3
+✅ Delta format validated
+✅ Read operation successful
+
+📊 Services Utilized
+AWS
+
+EC2
+
+IAM
+
+S3
+
+VPC
+
+KMS
+
+STS
+
+PrivateLink endpoints
+
+Databricks
+
+Account Console
+
+Workspace
+
+Unity Catalog
+
+Clusters
+
+Delta Lake
+
+Spark Runtime
+
+🎯 Key Outcomes
+
+✅ Fully automated deployment
+✅ Enterprise architecture pattern validated
+✅ Secure role-based access implemented
+✅ Spark workloads executed successfully
+✅ Terraform modules reusable for multi-LOB rollout
+
+💡 Lessons / Engineering Insights
+Instance Profiles are Mandatory
+
+Clusters cannot access S3 without registering IAM roles inside Databricks.
+
+Unity Catalog Changes Storage Behavior
+
+DBFS root is restricted — external locations should be used.
+
+Terraform Enables Platform Standardization
+
+Manual workspace creation is not scalable.
+
+🚀 Recommended Next Steps (Enterprise Evolution)
+Immediate Enhancements
+
+Implement Cluster Policies
+
+Enforce tagging standards
+
+Enable audit log delivery
+
+Configure cost monitoring
+
+Advanced Platform Capabilities
+
+Multi-workspace architecture
+
+CI/CD for Terraform
+
+Secrets management
+
+Data governance policies
+
+Auto-scaling job clusters
+
+⭐ Executive Summary
+
+This lab successfully demonstrated an enterprise-style deployment of Databricks on AWS using Terraform.
+
+The platform is now capable of provisioning secure workspaces, scalable compute, and governed storage — providing a strong foundation for production analytics workloads.
+
+
